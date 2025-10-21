@@ -3,472 +3,544 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Sholat & Alarm</title>
-
-    <!-- Bootstrap 5 + Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts: Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <title>Jadwal Sholat Harian & Countdown - Makassar</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         :root {
-            --bg-dark: #121212;
-            --card-bg: rgba(30, 30, 36, 0.7);
-            --text: #e0e0e0;
-            --text-muted: #aaaaaa;
-            --primary: #00bcd4;
-            --success: #4caf50;
-            --warning: #ff9800;
-            --danger: #f44336;
-            --info: #2196f3;
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #6c63ff;
+            --secondary: #4a44c9;
+            --accent: #ff6b6b;
+            --dark-bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --border-color: #333;
         }
-
-        * {
-            font-family: 'Poppins', sans-serif;
-        }
-
+        
         body {
-            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
-            color: var(--text);
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
-            padding: 1rem 0;
+            padding: 20px 0;
         }
-
-        .app-container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 0 1rem;
+        
+        .container {
+            max-width: 500px;
         }
-
-        /* Glassmorphism Card */
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 1.5rem;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
             overflow: hidden;
-            transition: transform 0.2s ease;
         }
-
-        .glass-card:hover {
-            transform: translateY(-4px);
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-bottom: none;
+            padding: 20px;
         }
-
-        /* Header */
-        .header-title {
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .current-time {
+            font-size: 2.5rem;
             font-weight: 700;
-            font-size: 1.4rem;
-            background: linear-gradient(90deg, var(--primary), #00e5ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--accent);
+            text-align: center;
+            margin: 10px 0;
         }
-
-        /* Waktu Sekarang */
-        #current-time {
-            font-size: 2.8rem;
+        
+        .countdown-container {
+            background: rgba(108, 99, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+        }
+        
+        .countdown {
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--primary);
-            text-shadow: 0 2px 10px rgba(0, 188, 212, 0.3);
-            letter-spacing: -1px;
-            animation: pulse 2s infinite alternate;
         }
-
-        @keyframes pulse {
-            from { opacity: 0.9; }
-            to { opacity: 1; }
-        }
-
-        /* Countdown */
-        #countdown-next-prayer {
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 0.6rem 1rem;
-            border-radius: 2rem;
-            background: rgba(0, 188, 212, 0.2);
-            color: var(--primary);
-            border: 1px solid var(--primary);
-            display: inline-block;
-            min-width: 200px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Lokasi & Tanggal */
-        #lokasi-tanggal {
+        
+        .info-text {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 20px;
             font-size: 0.9rem;
-            font-weight: 500;
         }
-
-        /* Info Hijriah */
-        #info {
-            font-size: 0.85rem;
-            color: var(--text-muted);
+        
+        .prayer-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 20px 0;
         }
-
-        /* Alarm Status */
-        #alarm-status {
-            font-size: 0.85rem;
-            border-radius: 1rem;
-            padding: 0.5rem 1rem;
-            backdrop-filter: blur(8px);
-            font-weight: 500;
+        
+        .prayer-table th {
+            background-color: rgba(108, 99, 255, 0.2);
+            color: var(--text-primary);
+            padding: 12px 15px;
+            font-weight: 600;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
         }
-
-        /* Jadwal Sholat - JAM RATA KANAN */
-        #jadwal-sholat .prayer-item {
-            background: rgba(40, 40, 50, 0.6) !important;
-            border: none !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-            color: #f0f0f0 !important;
-            padding: 1.1rem 1rem !important;
-            margin: 0 !important;
+        
+        .prayer-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .prayer-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .prayer-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .next-prayer {
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(255, 107, 107, 0.1)) !important;
+            color: var(--primary) !important;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .next-prayer::after {
+            content: "⏳ Berikutnya";
+            position: absolute;
+            right: 15px;
+            font-size: 0.7rem;
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-weight: 600;
             transition: all 0.3s ease;
-            backdrop-filter: blur(4px);
-            justify-content: space-between !important;
-            align-items: center !important;
         }
-
-        #jadwal-sholat .prayer-item:hover {
-            background: rgba(60, 60, 75, 0.8) !important;
-            border-radius: 1rem;
-            margin: 0.3rem 0.5rem;
+        
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 188, 212, 0.15);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.4);
         }
-
-        #jadwal-sholat .prayer-item:last-child {
-            border-bottom: none !important;
+        
+        .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
-
-        /* Container nama + ikon */
-        .prayer-name-container {
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+        }
+        
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: var(--accent);
+            background-color: rgba(255, 107, 107, 0.1);
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .prayer-icon {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .location-info {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            flex: 1;
-        }
-
-        .prayer-icon {
-            color: #00bcd4 !important;
-            font-size: 1.4rem;
-            width: 48px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .prayer-name {
-            font-weight: 600;
-            font-size: 1.05rem;
-            color: #e0e0e0;
-        }
-
-        /* JAM RATA KANAN */
-        .prayer-time {
-            font-weight: 700;
-            font-size: 1.15rem;
-            color: #00e5ff;
-            text-shadow: 0 1px 5px rgba(0, 229, 255, 0.3);
-            margin-left: auto !important;
-            text-align: right !important;
-            min-width: 60px;
-        }
-
-        /* Highlight Sholat Berikutnya */
-        .next-prayer {
-            background: linear-gradient(90deg, rgba(0, 188, 212, 0.25), rgba(0, 188, 212, 0.1)) !important;
-            border-left: 5px solid #00bcd4 !important;
-            border-radius: 1rem !important;
-            margin: 0.4rem 0.5rem !important;
-            transform: scale(1.02);
-            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.25);
-            animation: glow 2s infinite alternate;
-        }
-
-        @keyframes glow {
-            from { box-shadow: 0 6px 20px rgba(0, 188, 212, 0.25); }
-            to { box-shadow: 0 6px 25px rgba(0, 188, 212, 0.4); }
-        }
-
-        /* Tombol Tes */
-        .btn-test {
-            border-radius: 2rem;
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-test:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Loading */
-        #loading {
+            justify-content: center;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
             font-size: 0.9rem;
-            color: var(--text-muted);
-            animation: blink 1.5s infinite;
         }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+        
+        .location-icon {
+            margin-right: 8px;
+            color: var(--primary);
         }
-
-        /* Footer */
-        .footer {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 2rem;
+        
+        /* Animasi untuk countdown */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .current-time {
+                font-size: 2rem;
+            }
+            
+            .countdown {
+                font-size: 1.3rem;
+            }
+            
+            .card-body {
+                padding: 20px 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid app-container">
-
-        <!-- Header Card -->
-        <div class="glass-card mb-4">
-            <div class="text-center p-4">
-                <h1 class="header-title mb-1">Jadwal Sholat</h1>
-
-                <!-- LOKASI: PUTIH -->
-                <p class="text-white mb-3" style="font-size: 0.9rem; font-weight: 500;">
-                    <i class="fas fa-map-marker-alt me-1"></i> Makassar, Indonesia
-                </p>
-
-                <div id="current-time" class="my-3">00:00:00</div>
-                <div id="countdown-next-prayer" class="mx-auto"></div>
-
-                <!-- TANGGAL: PUTIH -->
-                <div id="lokasi-tanggal" class="mt-2 text-white small"></div>
+    <div class="container">
+        <div class="card">
+            <div class="card-header text-center">
+                <h1 class="h4 mb-0">Jadwal Sholat Hari Ini 🕌</h1>
+                <div class="location-info mt-2">
+                    <i class="bi bi-geo-alt-fill location-icon"></i>
+                    <span>Makassar, Indonesia</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="current-time" id="current-time">--:--:-- WITA</div>
                 
-                <div id="info" class="mt-1"></div>
-
-                <div id="alarm-status" class="alert alert-dark mt-3 d-inline-flex align-items-center gap-2" role="alert">
-                    <i class="fas fa-bell text-warning"></i>
-                    <span>Alarm terpasang pada 17:30</span>
+                <div class="countdown-container">
+                    <div class="countdown" id="countdown">Memuat hitung mundur...</div>
+                </div>
+                
+                <div class="info-text" id="info">
+                    <div class="loading" id="loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Memuat...</span>
+                        </div>
+                        <p class="mt-2">Memuat jadwal sholat...</p>
+                    </div>
+                </div>
+                
+                <div class="error" id="error" style="display: none;"></div>
+                
+                <table class="prayer-table" id="prayer-times-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Sholat</th>
+                            <th>Waktu (WITA)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prayer-times-body">
+                    </tbody>
+                </table>
+                
+                <div class="d-grid gap-2 mt-4">
+                    <button id="test-adzan-button" class="btn btn-primary">
+                        <i class="bi bi-volume-up-fill"></i> Tes Adzan (Waktu Sholat)
+                    </button>
+                    <button id="test-custom-alarm-button" class="btn btn-outline-primary">
+                        <i class="bi bi-alarm"></i> Tes Alarm Khusus (17:30)
+                    </button>
                 </div>
             </div>
         </div>
-
-        <!-- Tombol Tes -->
-        <div class="d-grid d-md-flex gap-3 mb-4">
-            <button class="btn btn-outline-info btn-test flex-fill" onclick="testAdzan()">
-                <i class="fas fa-play-circle me-2"></i> Tes Adzan
-            </button>
-            <button class="btn btn-outline-warning btn-test flex-fill text-white" onclick="testAlarm()">
-                <i class="fas fa-bell me-2"></i> Tes Alarm
-            </button>
-        </div>
-
-        <!-- Jadwal Sholat -->
-        <div class="glass-card">
-            <div class="p-3 text-center">
-                <h5 class="mb-0 fw-bold text-info">Jadwal Hari Ini</h5>
-            </div>
-            <ul id="jadwal-sholat" class="list-group list-group-flush"></ul>
-        </div>
-
-        <div id="loading" class="text-center mt-3">Memuat jadwal sholat...</div>
-
-        <!-- Audio -->
-        <audio id="adzan-sound" src="adzan.mp3" preload="auto"></audio>
-        <audio id="alarm-sound" src="alarm.mp3" preload="auto"></audio>
-
-        <div class="footer text-center">
-            Dibuat dengan cinta untuk Umat
-        </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Audio Elements -->
+    <audio id="adzan-audio" src="adzan.mp3" preload="auto"></audio>
+    <audio id="custom-alarm-audio" src="alarm.mp3" preload="auto"></audio>
 
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
-        // --- Konfigurasi ---
-        const CONFIG = {
-            CITY: 'Makassar',
-            COUNTRY: 'Indonesia',
-            METHOD: 11,
-            ALARM_TIME_STR: '17:30',
-            PRAYERS: {
-                'Fajr':    { name: 'Subuh',   icon: 'fa-moon' },
-                'Dhuhr':   { name: 'Dzuhur',  icon: 'fa-sun' },
-                'Asr':     { name: 'Ashar',   icon: 'fa-cloud-sun' },
-                'Maghrib': { name: 'Maghrib', icon: 'fa-moon' },
-                'Isha':    { name: 'Isya',    icon: 'fa-moon' }
-            }
-        };
+        // Data Lokasi Makassar, Indonesia
+        const LATITUDE = -5.1477; 
+        const LONGITUDE = 119.4327; 
+        const METHOD = 9; // Metode Kalkulasi: Kemenag RI
+        const CUSTOM_ALARM_TIME = "17:30"; 
+        const CUSTOM_ALARM_NAME = "Alarm Khusus 17:30"; 
+        
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1;
+        const day = today.getDate();
+        
+        const API_URL = `https://api.aladhan.com/v1/timings/${day}-${month}-${year}?latitude=${LATITUDE}&longitude=${LONGITUDE}&method=${METHOD}`;
 
-        const API_URL = `https://api.aladhan.com/v1/timingsByCity?city=${CONFIG.CITY}&country=${CONFIG.COUNTRY}&method=${CONFIG.METHOD}`;
-        const PRAYER_KEYS = Object.keys(CONFIG.PRAYERS);
+        // Variabel Global
+        let prayerTimings = {}; 
+        let alarmedPrayers = []; 
+        let isCustomAlarmTriggered = false; 
+        let nextPrayerTimeDate = null; // Waktu sholat berikutnya (objek Date)
+        let nextPrayerName = ""; // Nama sholat berikutnya
+        
+        const adzanPlayer = document.getElementById('adzan-audio');
+        const customPlayer = document.getElementById('custom-alarm-audio');
+        const infoElement = document.getElementById('info');
+        const loadingElement = document.getElementById('loading');
+        const errorElement = document.getElementById('error');
+        const tableElement = document.getElementById('prayer-times-table');
+        const bodyElement = document.getElementById('prayer-times-body');
+        const testAdzanButton = document.getElementById('test-adzan-button');
+        const testCustomAlarmButton = document.getElementById('test-custom-alarm-button');
+        const countdownElement = document.getElementById('countdown'); // Elemen countdown
 
-        // --- DOM Elements ---
-        const $ = id => document.getElementById(id);
-        const elements = {
-            jadwal: $('jadwal-sholat'),
-            lokasi: $('lokasi-tanggal'),
-            info: $('info'),
-            loading: $('loading'),
-            time: $('current-time'),
-            countdown: $('countdown-next-prayer'),
-            adzan: $('adzan-sound'),
-            alarm: $('alarm-sound'),
-            alarmStatus: $('alarm-status')
-        };
-
-        let prayerTimings = {};
-        let adzanPlayed = {};
-        let alarmPlayedToday = false;
-        let checkInterval = null;
-
-        // --- Helper ---
-        function timeToMinutes(t) {
-            const [h, m] = t.split(':').map(Number);
-            return h * 60 + m;
+        // FUNGSI UNTUK MEMUTAR AUDIO
+        function playAudio(player, alertMessage) {
+            player.currentTime = 0; 
+            player.play().then(() => {
+                console.log(alertMessage + " diputar.");
+            }).catch(error => {
+                console.error("Gagal memutar audio: ", error);
+                alert(`Gagal memutar ${alertMessage}. Beberapa browser memerlukan interaksi pengguna.`);
+            });
         }
-
-        function playAudio(el, name) {
-            el.currentTime = 0;
-            el.play().catch(e => console.error(`Audio error (${name}):`, e));
-        }
-
-        window.testAdzan = () => playAudio(elements.adzan, 'Adzan');
-        window.testAlarm = () => playAudio(elements.alarm, 'Alarm');
-
-        // --- Fetch Jadwal ---
-        async function getPrayerTimes() {
-            elements.loading.textContent = 'Mengambil data dari Aladhan...';
-            try {
-                const res = await fetch(API_URL);
-                const data = await res.json();
-                if (data.code !== 200) throw new Error('Gagal memuat data');
-
-                prayerTimings = data.data.timings;
-                const date = data.data.date;
-                PRAYER_KEYS.forEach(p => adzanPlayed[p] = false);
-
-                // JAM RATA KANAN
-                elements.jadwal.innerHTML = PRAYER_KEYS.map(key => {
-                    const time = prayerTimings[key];
-                    const prayer = CONFIG.PRAYERS[key];
-                    return `
-                        <li class="list-group-item prayer-item d-flex" data-prayer="${key}">
-                            <div class="prayer-name-container">
-                                <div class="prayer-icon">
-                                    <i class="fas ${prayer.icon}"></i>
-                                </div>
-                                <div class="prayer-name">${prayer.name}</div>
-                            </div>
-                            <div class="prayer-time">${time}</div>
-                        </li>
-                    `;
-                }).join('');
-
-                const today = new Date().toLocaleDateString('id-ID', { 
-                    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
-                });
-                elements.lokasi.innerHTML = `<i class="far fa-calendar-alt me-1"></i> ${today}`;
-                
-                elements.info.innerHTML = `<i class="fas fa-calendar-alt me-1"></i> ${date.hijri.day} ${date.hijri.month.en} ${date.hijri.year} H`;
-
-                elements.loading.textContent = '';
-                elements.alarmStatus.innerHTML = `<i class="fas fa-bell me-1 text-warning"></i> <span>Alarm terpasang pada ${CONFIG.ALARM_TIME_STR}</span>`;
-
-                if (!checkInterval) {
-                    checkInterval = setInterval(checkTimes, 1000);
-                }
-            } catch (err) {
-                elements.loading.textContent = `Error: ${err.message}`;
-            }
-        }
-
-        // --- Cek Waktu & Alarm ---
-        function checkTimes() {
+        
+        // FUNGSI UTAMA YANG BERJALAN SETIAP DETIK
+        function updateClockAndCheckAlarm() {
             const now = new Date();
-            const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
-            const currentStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-            const currentSec = (h * 3600) + (m * 60) + s;
+            const timeString = now.toLocaleTimeString('id-ID', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                timeZone: 'Asia/Makassar' 
+            });
+            const currentTime = timeString.substring(0, 5);
+            document.getElementById('current-time').textContent = timeString + " WITA";
 
-            elements.time.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-            if (h === 0 && m === 0 && s < 5) {
-                alarmPlayedToday = false;
-                getPrayerTimes();
+            if (Object.keys(prayerTimings).length > 0) {
+                checkPrayerAlarm(currentTime);
+                checkCustomAlarm(currentTime); 
+                updateCountdown(); // Panggil fungsi hitung mundur
+            }
+        }
+        
+        // FUNGSI UNTUK MENGHITUNG MUNDUR (COUNTDOWN)
+        function updateCountdown() {
+            if (!nextPrayerTimeDate) {
+                findNextPrayerAndHighlight(); // Mencari sholat berikutnya jika belum diinisialisasi
+                countdownElement.textContent = "Mencari waktu sholat berikutnya...";
+                return;
             }
 
-            if (currentStr === CONFIG.ALARM_TIME_STR && s < 10 && !alarmPlayedToday) {
-                playAudio(elements.alarm, 'Alarm Harian');
-                alarmPlayedToday = true;
-                elements.alarmStatus.className = 'alert alert-danger d-inline-flex align-items-center gap-2';
-                elements.alarmStatus.innerHTML = `<i class="fas fa-bell"></i> <strong>ALARM BERBUNYI!</strong>`;
-                setTimeout(() => {
-                    elements.alarmStatus.className = 'alert alert-dark d-inline-flex align-items-center gap-2';
-                    elements.alarmStatus.innerHTML = `<i class="fas fa-bell text-warning"></i> <span>Alarm terpasang pada ${CONFIG.ALARM_TIME_STR}</span>`;
-                }, 10000);
+            const now = new Date();
+            let diffMs = nextPrayerTimeDate.getTime() - now.getTime();
+
+            if (diffMs <= 0) {
+                // Jika waktu telah tercapai atau terlewat, tampilkan pesan dan hitung ulang sholat berikutnya
+                countdownElement.innerHTML = `<span class="pulse">Waktu <strong>${nextPrayerName}</strong> telah tiba!</span>`;
+                findNextPrayerAndHighlight(); 
+                return;
             }
 
-            let nextPrayer = null;
-            let minDiff = Infinity;
+            const totalSeconds = Math.floor(diffMs / 1000);
+            const seconds = totalSeconds % 60;
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const minutes = totalMinutes % 60;
+            const hours = Math.floor(totalMinutes / 60);
 
-            document.querySelectorAll('.prayer-item').forEach(el => el.classList.remove('next-prayer'));
+            const formattedTime = [hours, minutes, seconds]
+                .map(t => String(t).padStart(2, '0'))
+                .join(':');
 
-            PRAYER_KEYS.forEach(prayer => {
-                const timeStr = prayerTimings[prayer];
-                if (!timeStr) return;
+            countdownElement.innerHTML = `⏳ <strong>${nextPrayerName}</strong> dalam: ${formattedTime}`;
+        }
+        
+        // FUNGSI UNTUK MENCARI WAKTU SHOLAT BERIKUTNYA DAN MEMBERI HIGHLIGHT
+        function findNextPrayerAndHighlight() {
+            const now = new Date();
+            const nowTimeMinutes = now.getHours() * 60 + now.getMinutes();
 
-                const prayerSec = timeToMinutes(timeStr) * 60;
-                if (currentStr === timeStr && s < 10 && !adzanPlayed[prayer]) {
-                    playAudio(elements.adzan, CONFIG.PRAYERS[prayer].name);
-                    adzanPlayed[prayer] = true;
-                    const row = document.querySelector(`[data-prayer="${prayer}"]`);
-                    row.style.background = 'rgba(244, 67, 54, 0.3)';
-                    row.style.borderRadius = '1rem';
-                    setTimeout(() => {
-                        row.style.background = '';
-                        row.style.borderRadius = '';
-                    }, 6000);
-                }
-
-                let diff = prayerSec - currentSec;
-                if (diff <= 0) diff += 86400;
-                if (diff > 0 && diff < minDiff) {
-                    minDiff = diff;
-                    nextPrayer = prayer;
-                }
+            const prayers = [
+                { name: "Subuh", time: prayerTimings.Fajr },
+                { name: "Dzuhur", time: prayerTimings.Dhuhr },
+                { name: "Ashar", time: prayerTimings.Asr },
+                { name: "Maghrib", time: prayerTimings.Maghrib },
+                { name: "Isya", time: prayerTimings.Isha }
+            ];
+            
+            // Hapus highlight dari semua baris
+            document.querySelectorAll('#prayer-times-body tr').forEach(row => {
+                row.classList.remove('next-prayer');
             });
 
-            if (nextPrayer) {
-                const row = document.querySelector(`[data-prayer="${nextPrayer}"]`);
-                row.classList.add('next-prayer');
+            let nextPrayerIndex = -1;
 
-                const mins = Math.ceil(minDiff / 60);
-                const hrs = Math.floor(mins / 60);
-                const min = mins % 60;
-                const name = CONFIG.PRAYERS[nextPrayer].name;
+            // 1. Cari sholat yang akan datang HARI INI
+            for (let i = 0; i < prayers.length; i++) {
+                if (convertToMinutes(prayers[i].time) > nowTimeMinutes) {
+                    nextPrayerIndex = i;
+                    break;
+                }
+            }
+            
+            let targetDate = new Date(now);
 
-                elements.countdown.innerHTML = `${name} dalam <strong>${hrs > 0 ? hrs + ' jam ' : ''}${min} menit</strong>`;
-                elements.countdown.style.background = 'rgba(0, 188, 212, 0.2)';
-                elements.countdown.style.borderColor = 'var(--primary)';
+            if (nextPrayerIndex !== -1) {
+                // Sholat berikutnya ditemukan hari ini
+                const p = prayers[nextPrayerIndex];
+                nextPrayerName = p.name;
+                const [hours, minutes] = p.time.split(':').map(Number);
+                
+                // Set tanggal hari ini dengan waktu sholat
+                nextPrayerTimeDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), hours, minutes, 0);
+                
+                // Tambahkan highlight pada baris tabel yang bersangkutan
+                const rows = bodyElement.getElementsByTagName('tr');
+                rows[nextPrayerIndex].classList.add('next-prayer');
+
             } else {
-                elements.countdown.innerHTML = 'Menunggu Subuh...';
-                elements.countdown.style.background = 'rgba(244, 67, 54, 0.2)';
-                elements.countdown.style.borderColor = 'var(--danger)';
+                // Semua sholat hari ini telah lewat, sholat berikutnya adalah Subuh BESOK
+                const fajrTime = prayerTimings.Fajr;
+                nextPrayerName = "Subuh";
+                const [hours, minutes] = fajrTime.split(':').map(Number);
+                
+                // Hitung tanggal besok
+                targetDate.setDate(targetDate.getDate() + 1);
+                
+                // Set tanggal besok dengan waktu Subuh
+                nextPrayerTimeDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), hours, minutes, 0);
+
+                // Tambahkan highlight pada baris Subuh
+                const rows = bodyElement.getElementsByTagName('tr');
+                rows[0].classList.add('next-prayer');
             }
         }
+        
+        // FUNGSI LOGIKA ALARM KHUSUS
+        function checkCustomAlarm(currentTime) {
+            if (currentTime === CUSTOM_ALARM_TIME && !isCustomAlarmTriggered) {
+                playAudio(customPlayer, CUSTOM_ALARM_NAME);
+                alert(`⏰ ${CUSTOM_ALARM_NAME} telah tiba!`);
+                isCustomAlarmTriggered = true;
+            }
+            if (currentTime === "00:00") {
+                isCustomAlarmTriggered = false;
+            }
+        }
+        
+        // FUNGSI LOGIKA ALARM SHOLAT
+        function checkPrayerAlarm(currentTime) {
+            const prayers = [
+                { name: "Subuh", time: prayerTimings.Fajr },
+                { name: "Dzuhur", time: prayerTimings.Dhuhr },
+                { name: "Ashar", time: prayerTimings.Asr },
+                { name: "Maghrib", time: prayerTimings.Maghrib },
+                { name: "Isya", time: prayerTimings.Isha }
+            ];
 
-        // Init
-        getPrayerTimes();
+            prayers.forEach(p => {
+                if (p.time === currentTime && !alarmedPrayers.includes(p.name)) {
+                    playAudio(adzanPlayer, "Adzan");
+                    alert(`Waktu sholat ${p.name} telah tiba!`);
+                    alarmedPrayers.push(p.name);
+                }
+            });
+        }
+        
+        function convertToMinutes(timeString) {
+            const [hours, minutes] = timeString.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        // FUNGSI UNTUK MENGAMBIL JADWAL SHOLAT
+        async function fetchPrayerTimes() {
+            loadingElement.style.display = 'block';
+            errorElement.style.display = 'none';
+            tableElement.style.display = 'none';
+
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                if (data.code === 200) {
+                    prayerTimings = data.data.timings; 
+                    
+                    const date_hijri = data.data.date.hijri.date;
+                    const date_gregorian = data.data.date.gregorian.date;
+                    
+                    infoElement.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <span>Tanggal Masehi: ${date_gregorian}</span>
+                            <span>Tanggal Hijriyah: ${date_hijri}</span>
+                        </div>
+                    `;
+
+                    const prayerData = [
+                        { name: "Subuh", time: prayerTimings.Fajr },
+                        { name: "Dzuhur", time: prayerTimings.Dhuhr },
+                        { name: "Ashar", time: prayerTimings.Asr },
+                        { name: "Maghrib", time: prayerTimings.Maghrib },
+                        { name: "Isya", time: prayerTimings.Isha }
+                    ];
+
+                    bodyElement.innerHTML = ''; 
+                    prayerData.forEach(p => {
+                        const row = bodyElement.insertRow();
+                        const cellName = row.insertCell();
+                        const cellTime = row.insertCell();
+                        cellName.innerHTML = `<i class="bi bi-sun prayer-icon"></i> ${p.name}`;
+                        cellTime.textContent = p.time;
+                    });
+                    
+                    tableElement.style.display = 'table';
+                    loadingElement.style.display = 'none';
+                    
+                    // Panggil fungsi untuk menghitung waktu sholat berikutnya setelah data dimuat
+                    findNextPrayerAndHighlight(); 
+                    
+                } else {
+                    errorElement.textContent = `Gagal memuat data jadwal sholat: ${data.status}`;
+                    errorElement.style.display = 'block';
+                    loadingElement.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('Error fetching prayer times:', error);
+                errorElement.textContent = 'Terjadi kesalahan saat mengambil data jadwal sholat. Cek koneksi Anda.';
+                errorElement.style.display = 'block';
+                loadingElement.style.display = 'none';
+            }
+        }
+        
+        // EVENT LISTENER UNTUK TOMBOL TES
+        testAdzanButton.addEventListener('click', () => {
+            playAudio(adzanPlayer, "Adzan");
+        });
+        testCustomAlarmButton.addEventListener('click', () => {
+            playAudio(customPlayer, "Alarm Khusus 17:30");
+        });
+
+        // Panggil fungsi utama saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPrayerTimes();
+            setInterval(updateClockAndCheckAlarm, 1000);
+        });
     </script>
 </body>
 </html>
