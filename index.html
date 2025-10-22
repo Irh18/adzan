@@ -1,643 +1,145 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Sholat - Makassar</title>
+    <title>Custom Alarm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #0f1419;
-            --card-bg: #1a1f2e;
-            --text-primary: #e2e8f0;
-            --text-secondary: #94a3b8;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --border: #2d3748;
-            --success: #10b981;
-            --warning: #f59e0b;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            line-height: 1.6;
-            padding: 16px;
-            min-height: 100vh;
+            background-color: #f8f9fa;
         }
-
-        .container {
+        .alarm-container {
             max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: var(--text-primary);
-        }
-
-        .location {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .current-time {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 24px 0;
-            color: var(--accent);
-            letter-spacing: -0.5px;
-        }
-
-        .countdown-container {
-            background: rgba(59, 130, 246, 0.1);
-            border-radius: 12px;
-            padding: 16px;
-            margin: 20px 0;
-            text-align: center;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-
-        .countdown {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--accent);
-        }
-
-        .info {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            padding: 0 10px;
-        }
-
-        .prayer-list {
-            background: var(--card-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 24px;
-            border: 1px solid var(--border);
-        }
-
-        .prayer-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .prayer-item:last-child {
-            border-bottom: none;
-        }
-
-        .prayer-name {
-            font-weight: 500;
-        }
-
-        .prayer-time {
-            font-weight: 600;
-        }
-
-        .next-prayer {
-            background: rgba(59, 130, 246, 0.15);
-            border-left: 4px solid var(--accent);
-        }
-
-        .next-prayer .prayer-name {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .next-prayer .prayer-time {
-            color: var(--accent);
-        }
-
-        .actions {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .btn {
-            padding: 14px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-hover);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-        }
-
-        .error {
-            text-align: center;
+            margin: 50px auto;
             padding: 20px;
-            color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
+            background-color: white;
             border-radius: 10px;
-            margin: 15px 0;
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-
-        .hidden {
-            display: none;
+        .alarm-list {
+            max-height: 300px;
+            overflow-y: auto;
         }
-
-        .pulse {
-            animation: pulse 2s infinite;
+        .alarm-item {
+            transition: background-color 0.3s;
         }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-
-        #permission-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 20, 25, 0.95);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        #permission-overlay h2 {
-            margin-bottom: 10px;
-            color: var(--accent);
-        }
-
-        #permission-overlay p {
-            margin-bottom: 25px;
-            color: var(--text-secondary);
-        }
-
-        @media (max-width: 480px) {
-            .current-time {
-                font-size: 2rem;
-            }
-
-            .countdown {
-                font-size: 1.1rem;
-            }
-
-            .prayer-item {
-                padding: 14px 16px;
-            }
+        .alarm-item:hover {
+            background-color: #f1f1f1;
         }
     </style>
 </head>
 <body>
-    <div id="permission-overlay">
-        <h2>Aktifkan Notifikasi Audio 🔊</h2>
-        <p>Browser Anda memerlukan interaksi pengguna untuk mengaktifkan adzan/alarm otomatis. Mohon klik tombol di bawah.</p>
-        <button id="start-button" class="btn btn-primary" style="font-size: 1.1rem; padding: 16px 30px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-            </svg>
-            Mulai Aplikasi
-        </button>
-    </div>
-    <div class="container">
-        <div class="header">
-            <h1>Jadwal Sholat</h1>
-            <div class="location">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                <span>Makassar, Indonesia</span>
+    <div class="alarm-container">
+        <h3 class="text-center mb-4">Custom Alarm</h3>
+        <form id="alarmForm" class="mb-4">
+            <div class="mb-3">
+                <label for="alarmTime" class="form-label">Set Alarm Time</label>
+                <input type="time" class="form-control" id="alarmTime" required>
             </div>
-        </div>
-
-        <div class="current-time" id="current-time">--:--:-- WITA</div>
-
-        <div class="countdown-container">
-            <div class="countdown" id="countdown">Memuat hitung mundur...</div>
-        </div>
-
-        <div class="info" id="info">
-            <div class="loading" id="loading">
-                <div class="pulse">Memuat jadwal sholat...</div>
+            <div class="mb-3">
+                <label for="alarmNote" class="form-label">Note (optional)</label>
+                <input type="text" class="form-control" id="alarmNote" placeholder="Enter note for this alarm">
             </div>
-        </div>
-
-        <div class="error hidden" id="error"></div>
-
-        <div class="prayer-list hidden" id="prayer-times">
+            <div class="mb-3">
+                <label for="alarmSoundSelect" class="form-label">Select Sound</label>
+                <select class="form-select" id="alarmSoundSelect" required>
+                    <option value="alarm.mp3">Alarm</option>
+                    <option value="adzan.mp3">Adzan</option>
+                </select>
             </div>
-
-        <div class="actions">
-            <button id="test-adzan-button" class="btn btn-primary">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-                </svg>
-                Tes Adzan
-            </button>
-            <button id="test-custom-alarm-button" class="btn btn-outline">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="13" r="8"></circle>
-                    <path d="M12 9v4l2 2"></path>
-                    <path d="M5 3L2 6"></path>
-                    <path d="M22 6l-3-3"></path>
-                    <path d="M6 19l-2 2"></path>
-                    <path d="M18 19l2 2"></path>
-                </svg>
-                Tes Alarm (17:30)
-            </button>
+            <button type="submit" class="btn btn-primary w-100">Add Alarm</button>
+        </form>
+        <div class="alarm-list">
+            <h5>Scheduled Alarms</h5>
+            <ul id="alarmList" class="list-group">
+                <!-- Alarms will be added here dynamically -->
+            </ul>
         </div>
     </div>
 
-    <audio id="adzan-audio" src="adzan.mp3" preload="auto"></audio>
-    <audio id="custom-alarm-audio" src="alarm.mp3" preload="auto"></audio>
+    <audio id="alarmSound" src="alarm.mp3"></audio>
 
     <script>
-        // Data Lokasi Makassar, Indonesia
-        const LATITUDE = -5.1477;
-        const LONGITUDE = 119.4327;
-        const METHOD = 9; // Metode Kalkulasi: Kemenag RI
-        const CUSTOM_ALARM_TIME = "17:30";
-        const CUSTOM_ALARM_NAME = "Alarm Khusus 17:30";
+        const alarmForm = document.getElementById('alarmForm');
+        const alarmTimeInput = document.getElementById('alarmTime');
+        const alarmNoteInput = document.getElementById('alarmNote');
+        const alarmSoundSelect = document.getElementById('alarmSoundSelect');
+        const alarmList = document.getElementById('alarmList');
+        const alarmSound = document.getElementById('alarmSound');
+        let alarms = [];
 
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth() + 1;
-        const day = today.getDate();
+        // Load alarms from localStorage if available
+        if (localStorage.getItem('alarms')) {
+            alarms = JSON.parse(localStorage.getItem('alarms'));
+            renderAlarms();
+        }
 
-        const API_URL = `https://api.aladhan.com/v1/timings/${day}-${month}-${year}?latitude=${LATITUDE}&longitude=${LONGITUDE}&method=${METHOD}`;
+        alarmForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const time = alarmTimeInput.value;
+            const note = alarmNoteInput.value || 'No note';
+            const sound = alarmSoundSelect.value;
+            if (time && sound) {
+                alarms.push({ time, note, sound });
+                alarms.sort((a, b) => a.time.localeCompare(b.time)); // Sort alarms by time
+                localStorage.setItem('alarms', JSON.stringify(alarms));
+                renderAlarms();
+                alarmTimeInput.value = '';
+                alarmNoteInput.value = '';
+                alarmSoundSelect.value = 'alarm.mp3';
+            }
+        });
 
-        // Variabel Global
-        let prayerTimings = {};
-        let alarmedPrayers = [];
-        let isCustomAlarmTriggered = false;
-        let nextPrayerTimeDate = null;
-        let nextPrayerName = "";
-
-        // Elemen DOM
-        const adzanPlayer = document.getElementById('adzan-audio');
-        const customPlayer = document.getElementById('custom-alarm-audio');
-        const infoElement = document.getElementById('info');
-        const loadingElement = document.getElementById('loading');
-        const errorElement = document.getElementById('error');
-        const prayerListElement = document.getElementById('prayer-times');
-        const testAdzanButton = document.getElementById('test-adzan-button');
-        const testCustomAlarmButton = document.getElementById('test-custom-alarm-button');
-        const countdownElement = document.getElementById('countdown');
-        // Elemen baru untuk Autoplay Policy
-        const startButton = document.getElementById('start-button');
-        const overlay = document.getElementById('permission-overlay');
-
-        /**
-         * Memutar audio dengan menangani potensi blokir browser.
-         */
-        function playAudio(player, alertMessage) {
-            player.currentTime = 0;
-            // Coba memutar audio
-            player.play().then(() => {
-                console.log(alertMessage + " diputar.");
-            }).catch(error => {
-                // Jika browser memblokir (NotAllowedError), berikan pesan
-                console.error("Gagal memutar audio: ", error);
-                alert(`Gagal memutar ${alertMessage}. Harap pastikan Anda telah mengklik tombol "Mulai Aplikasi" atau tombol Tes.`);
+        function renderAlarms() {
+            alarmList.innerHTML = '';
+            alarms.forEach((alarm, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center alarm-item';
+                li.innerHTML = `
+                    <div>
+                        <strong>${alarm.time}</strong>
+                        <small class="text-muted d-block">${alarm.note}</small>
+                        <small class="text-muted d-block">Sound: ${alarm.sound === 'alarm.mp3' ? 'Alarm' : 'Adzan'}</small>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary btn-sm me-2" onclick="toggleSound(${index})">
+                            ${alarm.sound === 'alarm.mp3' ? 'Use Adzan' : 'Use Alarm'}
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteAlarm(${index})">Delete</button>
+                    </div>
+                `;
+                alarmList.appendChild(li);
             });
         }
 
-        /**
-         * Fungsi utama yang berjalan setiap detik untuk update jam dan cek alarm.
-         */
-        function updateClockAndCheckAlarm() {
+        function toggleSound(index) {
+            alarms[index].sound = alarms[index].sound === 'alarm.mp3' ? 'adzan.mp3' : 'alarm.mp3';
+            localStorage.setItem('alarms', JSON.stringify(alarms));
+            renderAlarms();
+        }
+
+        function deleteAlarm(index) {
+            alarms.splice(index, 1);
+            localStorage.setItem('alarms', JSON.stringify(alarms));
+            renderAlarms();
+        }
+
+        // Check alarms every second
+        setInterval(() => {
             const now = new Date();
-            // Gunakan `timeZone: 'Asia/Makassar'` untuk memastikan waktu Makassar (WITA)
-            const timeString = now.toLocaleTimeString('id-ID', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                timeZone: 'Asia/Makassar'
-            });
-            const currentTime = timeString.substring(0, 5); // Ambil HH:MM
-            document.getElementById('current-time').textContent = timeString + " WITA";
-
-            if (Object.keys(prayerTimings).length > 0) {
-                checkPrayerAlarm(currentTime);
-                checkCustomAlarm(currentTime);
-                updateCountdown();
-            }
-        }
-
-        /**
-         * Fungsi untuk menghitung mundur waktu sholat berikutnya.
-         */
-        function updateCountdown() {
-            if (!nextPrayerTimeDate) {
-                findNextPrayerAndHighlight();
-                countdownElement.textContent = "Mencari waktu sholat berikutnya...";
-                return;
-            }
-
-            const now = new Date();
-            let diffMs = nextPrayerTimeDate.getTime() - now.getTime();
-
-            if (diffMs < -60000) { // Jika sudah lewat lebih dari 1 menit, cari sholat berikutnya
-                findNextPrayerAndHighlight();
-                return;
-            }
-
-            if (diffMs <= 0) {
-                countdownElement.innerHTML = `<span class="pulse">Waktu <strong>${nextPrayerName}</strong> telah tiba!</span>`;
-                // Atur ulang pencarian waktu berikutnya setelah beberapa detik
-                setTimeout(findNextPrayerAndHighlight, 5000);
-                return;
-            }
-
-            const totalSeconds = Math.floor(diffMs / 1000);
-            const seconds = totalSeconds % 60;
-            const totalMinutes = Math.floor(totalSeconds / 60);
-            const minutes = totalMinutes % 60;
-            const hours = Math.floor(totalMinutes / 60);
-
-            const formattedTime = [hours, minutes, seconds]
-                .map(t => String(t).padStart(2, '0'))
-                .join(':');
-
-            countdownElement.innerHTML = `⏳ <strong>${nextPrayerName}</strong> dalam: ${formattedTime}`;
-        }
-
-        /**
-         * Fungsi untuk mencari waktu sholat berikutnya dan memberikan highlight.
-         */
-        function findNextPrayerAndHighlight() {
-            const now = new Date();
-            // Konversi waktu saat ini ke menit (0 hingga 1439)
-            const nowTimeMinutes = now.getHours() * 60 + now.getMinutes();
-
-            const prayers = [
-                { name: "Subuh", time: prayerTimings.Fajr, key: 'Fajr' },
-                // Imsak, Sunrise, Sunset, Midnight, dll. diabaikan
-                { name: "Dzuhur", time: prayerTimings.Dhuhr, key: 'Dhuhr' },
-                { name: "Ashar", time: prayerTimings.Asr, key: 'Asr' },
-                { name: "Maghrib", time: prayerTimings.Maghrib, key: 'Maghrib' },
-                { name: "Isya", time: prayerTimings.Isha, key: 'Isha' }
-            ].filter(p => p.time); // Pastikan waktu ada
-
-            // Hapus highlight dari semua item
-            document.querySelectorAll('.prayer-item').forEach(item => {
-                item.classList.remove('next-prayer');
-            });
-
-            let nextPrayerIndex = -1;
-
-            // 1. Cari sholat yang akan datang HARI INI
-            for (let i = 0; i < prayers.length; i++) {
-                if (convertToMinutes(prayers[i].time) > nowTimeMinutes) {
-                    nextPrayerIndex = i;
-                    break;
-                }
-            }
-
-            let targetDate = new Date(now);
-
-            if (nextPrayerIndex !== -1) {
-                // Sholat berikutnya ditemukan hari ini
-                const p = prayers[nextPrayerIndex];
-                nextPrayerName = p.name;
-                const [hours, minutes] = p.time.split(':').map(Number);
-
-                // Set tanggal hari ini dengan waktu sholat
-                targetDate.setHours(hours, minutes, 0, 0);
-                nextPrayerTimeDate = targetDate;
-
-                // Tambahkan highlight pada item yang bersangkutan
-                const items = document.querySelectorAll('.prayer-item');
-                if (items[nextPrayerIndex]) {
-                    items[nextPrayerIndex].classList.add('next-prayer');
-                }
-
-            } else {
-                // Semua sholat hari ini telah lewat, sholat berikutnya adalah Subuh BESOK
-                const fajrTime = prayerTimings.Fajr;
-                nextPrayerName = "Subuh";
-                const [hours, minutes] = fajrTime.split(':').map(Number);
-
-                // Hitung tanggal besok
-                targetDate.setDate(targetDate.getDate() + 1);
-
-                // Set tanggal besok dengan waktu Subuh
-                targetDate.setHours(hours, minutes, 0, 0);
-                nextPrayerTimeDate = targetDate;
-
-                // Tambahkan highlight pada item Subuh (yang merupakan item pertama di daftar)
-                const items = document.querySelectorAll('.prayer-item');
-                if (items[0]) {
-                    items[0].classList.add('next-prayer');
-                }
-            }
-        }
-
-        function convertToMinutes(timeString) {
-            if (!timeString) return 0;
-            const [hours, minutes] = timeString.split(':').map(Number);
-            return hours * 60 + minutes;
-        }
-
-        /**
-         * Fungsi logika alarm khusus (custom alarm)
-         */
-        function checkCustomAlarm(currentTime) {
-            if (currentTime === CUSTOM_ALARM_TIME && !isCustomAlarmTriggered) {
-                playAudio(customPlayer, CUSTOM_ALARM_NAME);
-                alert(`⏰ ${CUSTOM_ALARM_NAME} telah tiba!`);
-                isCustomAlarmTriggered = true;
-            }
-            // Reset flag alarm setiap hari pada tengah malam
-            if (currentTime === "00:00") {
-                isCustomAlarmTriggered = false;
-            }
-        }
-
-        /**
-         * Fungsi logika alarm sholat
-         */
-        function checkPrayerAlarm(currentTime) {
-            const prayers = [
-                { name: "Subuh", time: prayerTimings.Fajr },
-                { name: "Dzuhur", time: prayerTimings.Dhuhr },
-                { name: "Ashar", time: prayerTimings.Asr },
-                { name: "Maghrib", time: prayerTimings.Maghrib },
-                { name: "Isya", time: prayerTimings.Isha }
-            ].filter(p => p.time);
-
-            prayers.forEach(p => {
-                // Cek apakah waktu sholat sudah tiba DAN belum pernah dibunyikan hari ini
-                if (p.time === currentTime && !alarmedPrayers.includes(p.name)) {
-                    playAudio(adzanPlayer, "Adzan");
-                    alert(`Waktu sholat ${p.name} telah tiba!`);
-                    alarmedPrayers.push(p.name);
-                }
-            });
-
-            // Reset list sholat yang sudah dibunyikan setiap hari pada tengah malam (saat Fajr)
-            if (currentTime === prayerTimings.Fajr && alarmedPrayers.length > 0) {
-                alarmedPrayers = [];
-            }
-        }
-
-        /**
-         * Fungsi untuk mengambil jadwal sholat dari API.
-         */
-        async function fetchPrayerTimes() {
-            loadingElement.style.display = 'block';
-            errorElement.classList.add('hidden');
-            prayerListElement.classList.add('hidden');
-
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-
-                if (data.code === 200) {
-                    prayerTimings = data.data.timings;
-                    
-                    const date_hijri = data.data.date.hijri.date;
-                    const date_gregorian = data.data.date.gregorian.date;
-                    
-                    infoElement.innerHTML = `
-                        <div>${date_gregorian} | ${date_hijri}</div>
-                    `;
-
-                    // Hanya tampilkan 5 sholat fardhu
-                    const prayerData = [
-                        { name: "Subuh", time: prayerTimings.Fajr },
-                        { name: "Dzuhur", time: prayerTimings.Dhuhr },
-                        { name: "Ashar", time: prayerTimings.Asr },
-                        { name: "Maghrib", time: prayerTimings.Maghrib },
-                        { name: "Isya", time: prayerTimings.Isha }
-                    ].filter(p => p.time); // Filter untuk memastikan waktu sholat yang penting ada
-
-                    prayerListElement.innerHTML = '';
-                    prayerData.forEach(p => {
-                        const prayerItem = document.createElement('div');
-                        prayerItem.className = 'prayer-item';
-                        prayerItem.innerHTML = `
-                            <div class="prayer-name">${p.name}</div>
-                            <div class="prayer-time">${p.time}</div>
-                        `;
-                        prayerListElement.appendChild(prayerItem);
+            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            alarms.forEach((alarm) => {
+                if (alarm.time === currentTime) {
+                    alarmSound.src = alarm.sound;
+                    alarmSound.play().catch(error => {
+                        console.error('Error playing alarm:', error);
                     });
-                    
-                    prayerListElement.classList.remove('hidden');
-                    loadingElement.style.display = 'none';
-                    
-                    findNextPrayerAndHighlight();
-
-                } else {
-                    errorElement.textContent = `Gagal memuat data jadwal sholat: ${data.status}`;
-                    errorElement.classList.remove('hidden');
-                    loadingElement.style.display = 'none';
                 }
-
-            } catch (error) {
-                console.error('Error fetching prayer times:', error);
-                errorElement.textContent = 'Terjadi kesalahan saat mengambil data jadwal sholat. Cek koneksi Anda.';
-                errorElement.classList.remove('hidden');
-                loadingElement.style.display = 'none';
-            }
-        }
-
-        // --- EVENT LISTENERS ---
-
-        // 1. Dapatkan Izin Putar Otomatis saat Tombol "Mulai Aplikasi" diklik
-        startButton.addEventListener('click', () => {
-            // Coba memutar dan menjeda kedua audio untuk mendapatkan izin browser
-            adzanPlayer.play().then(() => {
-                adzanPlayer.pause();
-                adzanPlayer.currentTime = 0;
-                customPlayer.play().then(() => {
-                    customPlayer.pause();
-                    customPlayer.currentTime = 0;
-                    overlay.style.display = 'none'; // Sembunyikan overlay
-                    console.log("Izin putar otomatis audio telah didapatkan.");
-                }).catch(err => {
-                    console.warn("Gagal mendapatkan izin audio custom, tapi adzan mungkin aman.", err);
-                    overlay.style.display = 'none';
-                });
-            }).catch(error => {
-                console.error("Gagal mendapatkan izin audio: ", error);
-                alert("Gagal mengaktifkan audio. Pastikan Anda telah mengizinkan suara di pengaturan browser Anda.");
-                overlay.style.display = 'none'; // Tetap sembunyikan untuk memungkinkan penggunaan aplikasi
             });
-        });
-
-        // 2. Event listener untuk tombol tes
-        testAdzanButton.addEventListener('click', () => {
-            playAudio(adzanPlayer, "Adzan");
-        });
-
-        testCustomAlarmButton.addEventListener('click', () => {
-            playAudio(customPlayer, "Alarm Khusus 17:30");
-        });
-
-        // 3. Panggil fungsi utama saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchPrayerTimes();
-            setInterval(updateClockAndCheckAlarm, 1000);
-        });
+        }, 1000);
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
