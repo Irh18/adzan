@@ -157,28 +157,12 @@
         }
 
         .alarm-list {
-            max-height: 300px;
-            overflow-y: auto;
             margin-top: 20px;
             border-radius: 15px;
             background-color: rgba(255, 255, 255, 0.05);
             padding: 15px;
         }
-
-        .alarm-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .alarm-list::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        .alarm-list::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
-
+        
         .alarm-item {
             background-color: rgba(255, 255, 255, 0.08);
             border: none;
@@ -241,20 +225,24 @@
             opacity: 0.5;
         }
 
+        /* MODIFIKASI: PERBESAR TAMPILAN WAKTU SAAT INI */
         .current-time {
             text-align: center;
             margin-bottom: 20px;
-            font-size: 1.2rem;
-            color: var(--text-secondary);
+            font-size: 2rem; /* Ukuran font diperbesar */
+            color: var(--primary); /* Menggunakan warna primary */
+            font-weight: 700; /* Dibuat lebih tebal */
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
         }
 
         .current-time i {
             color: var(--primary);
+            font-size: 2rem; /* Pastikan ikon juga membesar */
         }
+        /* AKHIR MODIFIKASI */
 
         .notification {
             position: fixed;
@@ -281,6 +269,33 @@
             color: var(--primary);
             font-size: 1.2rem;
         }
+        
+        /* DARK MODE MODAL STYLING */
+        .modal-content {
+            background-color: var(--dark-surface);
+            border-radius: 15px;
+            border: none;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            color: var(--text-primary);
+        }
+        
+        /* Pastikan tombol tutup (close button) modal terlihat */
+        .btn-close {
+            background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23e0e0e0'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+
 
         @media (max-width: 576px) {
             .alarm-container {
@@ -309,31 +324,11 @@
             <span id="currentTime">Loading...</span>
         </div>
         
-        <form id="alarmForm" class="mb-4">
-            <div class="mb-3">
-                <label for="alarmTime" class="form-label"><i class="far fa-clock me-2"></i>Set Alarm Time</label>
-                <input type="time" class="form-control" id="alarmTime" required>
-            </div>
-            <div class="mb-3">
-                <label for="alarmNote" class="form-label"><i class="far fa-sticky-note me-2"></i>Note (optional)</label>
-                <input type="text" class="form-control" id="alarmNote" placeholder="Enter note for this alarm">
-            </div>
-            <div class="mb-3">
-                <label for="alarmSoundSelect" class="form-label"><i class="fas fa-music me-2"></i>Select Sound</label>
-                <div class="input-group">
-                    <select class="form-select" id="alarmSoundSelect" required>
-                        <option value="alarm.mp3">Alarm</option>
-                        <option value="adzan.mp3">Adzan</option>
-                    </select>
-                    <button class="btn btn-outline-primary" type="button" onclick="testSound()">
-                        <i class="fas fa-volume-up"></i>
-                    </button>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">
-                <i class="fas fa-plus-circle me-2"></i>Add Alarm
+        <div class="d-grid mb-4">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAlarmModal">
+                <i class="fas fa-plus-circle me-2"></i>Create New Alarm
             </button>
-        </form>
+        </div>
         
         <div class="alarm-list">
             <h5><i class="fas fa-list-ul"></i>Scheduled Alarms</h5>
@@ -349,6 +344,48 @@
              <button class="btn btn-danger" id="stopAlarmButton" style="display:none;" onclick="stopAlarm()">
                  <i class="fas fa-stop-circle me-2"></i>Stop Alarm
              </button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addAlarmModal" tabindex="-1" aria-labelledby="addAlarmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAlarmModalLabel">
+                        <i class="fas fa-plus-circle me-2" style="color: var(--primary);"></i>Add New Alarm
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="alarmForm" class="mb-0">
+                        <div class="mb-3">
+                            <label for="alarmTime" class="form-label"><i class="far fa-clock me-2"></i>Set Alarm Time</label>
+                            <input type="time" class="form-control" id="alarmTime" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="alarmNote" class="form-label"><i class="far fa-sticky-note me-2"></i>Note (optional)</label>
+                            <input type="text" class="form-control" id="alarmNote" placeholder="Enter note for this alarm">
+                        </div>
+                        <div class="mb-3">
+                            <label for="alarmSoundSelect" class="form-label"><i class="fas fa-music me-2"></i>Select Sound</label>
+                            <div class="input-group">
+                                <select class="form-select" id="alarmSoundSelect" required>
+                                    <option value="alarm.mp3">Alarm</option>
+                                    <option value="adzan.mp3">Adzan</option>
+                                </select>
+                                <button class="btn btn-outline-primary" type="button" onclick="testSound()">
+                                    <i class="fas fa-volume-up"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-grid pt-2">
+                             <button type="submit" class="btn btn-primary">
+                                 <i class="fas fa-plus-circle me-2"></i>Set Alarm
+                             </button>
+                        </div>
+                    </form>
+                    </div>
+            </div>
         </div>
     </div>
 
@@ -459,6 +496,11 @@
                 alarmTimeInput.value = '';
                 alarmNoteInput.value = '';
                 
+                // Tutup modal setelah submit
+                const addAlarmModalElement = document.getElementById('addAlarmModal');
+                const addAlarmModal = bootstrap.Modal.getInstance(addAlarmModalElement) || new bootstrap.Modal(addAlarmModalElement);
+                addAlarmModal.hide();
+                
                 showNotification('Alarm Ditambahkan', `Alarm diatur untuk ${formatTimeForDisplay(time)}`);
             }
         });
@@ -545,7 +587,10 @@
                     alarm.triggered = false;
                 });
                 lastTriggeredMinute = now.getMinutes();
-                stopAlarm(); // Hentikan suara jika masih berbunyi saat menit baru dimulai
+                // Hentikan suara jika masih berbunyi saat menit baru dimulai, kecuali saat alarm dipicu
+                if (stopAlarmButton.style.display !== 'block') {
+                     stopAlarm(); 
+                }
             }
 
             // 2. Logika Pengecekan dan Pemicuan Alarm
