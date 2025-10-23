@@ -5,56 +5,358 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom Alarm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background-color: #f8f9fa;
+        :root {
+            --primary: #6c63ff;
+            --secondary: #4a44c6;
+            --dark-bg: #121212;
+            --dark-surface: #1e1e1e;
+            --dark-card: #252525;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #ff6b6b;
+            --success: #4caf50;
         }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
         .alarm-container {
             max-width: 500px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            margin: 20px auto;
+            padding: 30px;
+            background: linear-gradient(145deg, var(--dark-card), var(--dark-surface));
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
         }
+
+        .alarm-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        h3 {
+            color: var(--text-primary);
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        h5 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h5 i {
+            color: var(--primary);
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            background-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-primary);
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(255, 255, 255, 0.12);
+            border-color: var(--primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.25rem rgba(108, 99, 255, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background-color: var(--accent);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background-color: #ff5252;
+            transform: translateY(-1px);
+        }
+
         .alarm-list {
             max-height: 300px;
             overflow-y: auto;
+            margin-top: 20px;
+            border-radius: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 15px;
         }
+
+        .alarm-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .alarm-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .alarm-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
         .alarm-item {
-            transition: background-color 0.3s;
+            background-color: rgba(255, 255, 255, 0.08);
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .alarm-item:hover {
-            background-color: #f1f1f1;
+            background-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .alarm-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .alarm-time {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .alarm-note {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .alarm-sound {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .alarm-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            opacity: 0.5;
+        }
+
+        .current-time {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .current-time i {
+            color: var(--primary);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--dark-card);
+            color: var(--text-primary);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 576px) {
+            .alarm-container {
+                padding: 20px;
+            }
+            
+            .alarm-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .alarm-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
         }
     </style>
 </head>
 <body>
     <div class="alarm-container">
-        <h3 class="text-center mb-4">Custom Alarm</h3>
+        <h3><i class="fas fa-clock me-2"></i>Custom Alarm</h3>
+        
+        <div class="current-time">
+            <i class="fas fa-clock"></i>
+            <span id="currentTime">Loading...</span>
+        </div>
+        
         <form id="alarmForm" class="mb-4">
             <div class="mb-3">
-                <label for="alarmTime" class="form-label">Set Alarm Time</label>
+                <label for="alarmTime" class="form-label"><i class="far fa-clock me-2"></i>Set Alarm Time</label>
                 <input type="time" class="form-control" id="alarmTime" required>
             </div>
             <div class="mb-3">
-                <label for="alarmNote" class="form-label">Note (optional)</label>
+                <label for="alarmNote" class="form-label"><i class="far fa-sticky-note me-2"></i>Note (optional)</label>
                 <input type="text" class="form-control" id="alarmNote" placeholder="Enter note for this alarm">
             </div>
             <div class="mb-3">
-                <label for="alarmSoundSelect" class="form-label">Select Sound</label>
-                <select class="form-select" id="alarmSoundSelect" required>
-                    <option value="alarm.mp3">Alarm</option>
-                    <option value="adzan.mp3">Adzan</option>
-                </select>
+                <label for="alarmSoundSelect" class="form-label"><i class="fas fa-music me-2"></i>Select Sound</label>
+                <div class="input-group">
+                    <select class="form-select" id="alarmSoundSelect" required>
+                        <option value="alarm.mp3">Alarm</option>
+                        <option value="adzan.mp3">Adzan</option>
+                    </select>
+                    <button class="btn btn-outline-primary" type="button" onclick="testSound()">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Add Alarm</button>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-plus-circle me-2"></i>Add Alarm
+            </button>
         </form>
+        
         <div class="alarm-list">
-            <h5>Scheduled Alarms</h5>
+            <h5><i class="fas fa-list-ul"></i>Scheduled Alarms</h5>
             <ul id="alarmList" class="list-group">
-                <!-- Alarms will be added here dynamically -->
+                <div class="empty-state" id="emptyState">
+                    <i class="far fa-bell-slash"></i>
+                    <p>No alarms set yet</p>
+                </div>
             </ul>
+        </div>
+        
+        <div class="d-grid mt-3">
+             <button class="btn btn-danger" id="stopAlarmButton" style="display:none;" onclick="stopAlarm()">
+                 <i class="fas fa-stop-circle me-2"></i>Stop Alarm
+             </button>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-bell"></i>
+        <div>
+            <strong id="notificationTitle">Alarm!</strong>
+            <p id="notificationMessage" class="mb-0">It's time!</p>
         </div>
     </div>
 
@@ -67,78 +369,214 @@
         const alarmSoundSelect = document.getElementById('alarmSoundSelect');
         const alarmList = document.getElementById('alarmList');
         const alarmSound = document.getElementById('alarmSound');
-        let alarms = [];
+        const currentTimeElement = document.getElementById('currentTime');
+        const notification = document.getElementById('notification');
+        const notificationTitle = document.getElementById('notificationTitle');
+        const notificationMessage = document.getElementById('notificationMessage');
+        const emptyState = document.getElementById('emptyState');
+        const stopAlarmButton = document.getElementById('stopAlarmButton');
+        
+        let alarms = []; 
+        let lastTriggeredMinute = -1; // Melacak menit alarm terakhir dipicu
+        
+        // --- Fungsi Utama ---
 
-        // Load alarms from localStorage if available
-        if (localStorage.getItem('alarms')) {
-            alarms = JSON.parse(localStorage.getItem('alarms'));
-            renderAlarms();
+        function updateCurrentTime() {
+            const now = new Date();
+            // Format waktu (HH:mm:ss) 24 jam
+            const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            currentTimeElement.textContent = timeString;
         }
+
+        function showNotification(title, message) {
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // Fungsi untuk menyimpan alarm ke Local Storage (hanya data yang diperlukan)
+        function saveAlarmsToLocalStorage() {
+            const dataToSave = alarms.map(({ time, note, sound }) => ({ time, note, sound }));
+            localStorage.setItem('alarms', JSON.stringify(dataToSave));
+        }
+        
+        // Fungsi untuk memformat waktu
+        function formatTimeForDisplay(time) {
+            const [hours, minutes] = time.split(':');
+            return `${hours}:${minutes}`;
+        }
+        
+        function stopAlarm() {
+            alarmSound.pause();
+            alarmSound.currentTime = 0; // Mengatur ulang waktu audio ke awal
+            stopAlarmButton.style.display = 'none';
+        }
+        
+        function testSound() {
+            const selectedSound = alarmSoundSelect.value;
+            // Hentikan alarm yang mungkin sedang berbunyi
+            stopAlarm(); 
+            
+            // Atur dan mainkan suara yang dipilih
+            alarmSound.src = selectedSound;
+            alarmSound.play().catch(error => {
+                console.error('Error playing test sound:', error);
+                showNotification('Error', 'Gagal memutar suara, periksa izin browser.');
+            });
+            
+            // Sembunyikan tombol stop setelah suara selesai (jika durasi pendek)
+            setTimeout(stopAlarm, 3000); // Stop setelah 3 detik untuk tes
+        }
+
+        // --- Event Handlers ---
 
         alarmForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const time = alarmTimeInput.value;
             const note = alarmNoteInput.value || 'No note';
             const sound = alarmSoundSelect.value;
+            
             if (time && sound) {
-                alarms.push({ time, note, sound });
-                alarms.sort((a, b) => a.time.localeCompare(b.time)); // Sort alarms by time
-                localStorage.setItem('alarms', JSON.stringify(alarms));
+                // Pastikan alarm tidak duplikat
+                const alarmExists = alarms.some(alarm => alarm.time === time);
+                
+                if (alarmExists) {
+                    showNotification('Duplicate Alarm', 'Alarm dengan waktu ini sudah ada!');
+                    return;
+                }
+                
+                // Tambahkan alarm dengan flag 'triggered: false'
+                alarms.push({ time, note, sound, triggered: false });
+                alarms.sort((a, b) => a.time.localeCompare(b.time)); 
+                saveAlarmsToLocalStorage();
                 renderAlarms();
+                
+                // Reset form
                 alarmTimeInput.value = '';
                 alarmNoteInput.value = '';
-                alarmSoundSelect.value = 'alarm.mp3';
+                
+                showNotification('Alarm Ditambahkan', `Alarm diatur untuk ${formatTimeForDisplay(time)}`);
             }
         });
 
+        function toggleSound(index) {
+            alarms[index].sound = alarms[index].sound === 'alarm.mp3' ? 'adzan.mp3' : 'alarm.mp3';
+            saveAlarmsToLocalStorage();
+            renderAlarms();
+            
+            const soundName = alarms[index].sound === 'alarm.mp3' ? 'Alarm' : 'Adzan';
+            showNotification('Suara Diubah', `Suara alarm diubah menjadi ${soundName}`);
+        }
+
+        function deleteAlarm(index) {
+            const alarmTime = alarms[index].time;
+            alarms.splice(index, 1);
+            saveAlarmsToLocalStorage();
+            renderAlarms();
+            
+            showNotification('Alarm Dihapus', `Alarm untuk ${formatTimeForDisplay(alarmTime)} telah dihapus`);
+        }
+        
+        // --- Render UI ---
+
         function renderAlarms() {
             alarmList.innerHTML = '';
+            
+            if (alarms.length === 0) {
+                alarmList.appendChild(emptyState);
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
             alarms.forEach((alarm, index) => {
                 const li = document.createElement('li');
-                li.className = 'list-group-item d-flex justify-content-between align-items-center alarm-item';
+                li.className = 'list-group-item alarm-item';
                 li.innerHTML = `
                     <div>
-                        <strong>${alarm.time}</strong>
-                        <small class="text-muted d-block">${alarm.note}</small>
-                        <small class="text-muted d-block">Sound: ${alarm.sound === 'alarm.mp3' ? 'Alarm' : 'Adzan'}</small>
+                        <div class="alarm-time">${formatTimeForDisplay(alarm.time)}</div>
+                        <div class="alarm-note">${alarm.note}</div>
+                        <div class="alarm-sound">
+                            <i class="fas fa-music"></i>
+                            ${alarm.sound === 'alarm.mp3' ? 'Alarm' : 'Adzan'}
+                        </div>
                     </div>
-                    <div>
-                        <button class="btn btn-primary btn-sm me-2" onclick="toggleSound(${index})">
-                            ${alarm.sound === 'alarm.mp3' ? 'Use Adzan' : 'Use Alarm'}
+                    <div class="alarm-actions">
+                        <button class="btn btn-outline-primary btn-sm" onclick="toggleSound(${index})">
+                            <i class="fas fa-exchange-alt me-1"></i>Switch
                         </button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteAlarm(${index})">Delete</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteAlarm(${index})">
+                            <i class="fas fa-trash-alt me-1"></i>Delete
+                        </button>
                     </div>
                 `;
                 alarmList.appendChild(li);
             });
         }
+        
+        // --- Inisialisasi dan Logika Alarm ---
 
-        function toggleSound(index) {
-            alarms[index].sound = alarms[index].sound === 'alarm.mp3' ? 'adzan.mp3' : 'alarm.mp3';
-            localStorage.setItem('alarms', JSON.stringify(alarms));
+        // Load alarms dari localStorage saat halaman dimuat
+        if (localStorage.getItem('alarms')) {
+            // Inisialisasi flag 'triggered' ke false untuk setiap alarm
+            alarms = JSON.parse(localStorage.getItem('alarms')).map(alarm => ({
+                ...alarm,
+                triggered: false 
+            }));
             renderAlarms();
         }
 
-        function deleteAlarm(index) {
-            alarms.splice(index, 1);
-            localStorage.setItem('alarms', JSON.stringify(alarms));
-            renderAlarms();
-        }
-
-        // Check alarms every second
+        // Interval untuk memeriksa alarm setiap detik
         setInterval(() => {
             const now = new Date();
-            const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            const currentHours = now.getHours().toString().padStart(2, '0');
+            const currentMinutes = now.getMinutes().toString().padStart(2, '0');
+            const currentTime = `${currentHours}:${currentMinutes}`;
             
+            // 1. Logika Reset Flag 'triggered'
+            // Jika menit telah berubah, reset flag 'triggered' untuk semua alarm
+            if (now.getMinutes() !== lastTriggeredMinute) {
+                alarms.forEach(alarm => {
+                    alarm.triggered = false;
+                });
+                lastTriggeredMinute = now.getMinutes();
+                stopAlarm(); // Hentikan suara jika masih berbunyi saat menit baru dimulai
+            }
+
+            // 2. Logika Pengecekan dan Pemicuan Alarm
             alarms.forEach((alarm) => {
-                if (alarm.time === currentTime) {
+                // Cek jika waktu alarm cocok DAN alarm belum dipicu di menit ini
+                if (alarm.time === currentTime && !alarm.triggered) {
+                    
+                    // Hentikan suara alarm yang mungkin sedang berbunyi sebelum memutar yang baru
+                    stopAlarm(); 
+
                     alarmSound.src = alarm.sound;
-                    alarmSound.play().catch(error => {
+                    
+                    // Mainkan suara dan tangani potensi error
+                    alarmSound.play().then(() => {
+                        // Mark alarm sebagai dipicu agar tidak berbunyi lagi di menit ini
+                        alarm.triggered = true; 
+                        showNotification('Alarm!', `Saatnya ${formatTimeForDisplay(alarm.time)} - ${alarm.note}`);
+                        stopAlarmButton.style.display = 'block'; // Tampilkan tombol stop
+                    }).catch(error => {
                         console.error('Error playing alarm:', error);
+                        // Jika play gagal (misalnya karena kebijakan browser), biarkan triggered=false agar bisa mencoba lagi
+                        showNotification('Playback Failed', 'Gagal memutar suara alarm. Perlu interaksi pengguna.');
                     });
                 }
             });
-        }, 1000);
+            
+        }, 1000); // Cek setiap 1 detik
+
+        // Inisialisasi waktu saat ini dan update setiap detik
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
